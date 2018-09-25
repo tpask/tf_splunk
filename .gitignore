@@ -1,0 +1,11 @@
+# ignore state files for now
+*.tfstate
+*.tfstate.backup
+
+# ignore module directory
+.terraform/
+
+# ignore credentials
+/variables.tf
+
+
