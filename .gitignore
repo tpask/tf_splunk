@@ -6,6 +6,6 @@
 .terraform/
 
 # ignore credentials
+/credentials.tf
 /variables.tf
-
 
