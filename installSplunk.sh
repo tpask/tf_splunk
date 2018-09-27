@@ -1,8 +1,6 @@
 #!/usr/bin/bash
 
 #yum update
-stage="yum update"
-logger ``
 yum update -y
 
 #install aws cli
