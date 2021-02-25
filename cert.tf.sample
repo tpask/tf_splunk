@@ -1,0 +1,36 @@
+
+resource "tls_private_key" "ca" {
+  algorithm   = "ECDSA"
+}
+
+resource "tls_self_signed_cert" "ca" {
+  key_algorithm     = tls_private_key.ca.algorithm
+  private_key_pem   = tls_private_key.ca.private_key_pem
+  is_ca_certificate = true
+
+  validity_period_hours = "720"
+  allowed_uses          = [ 
+    "cert_signing",
+    "key_encipherment",
+    "digital_signature",
+  ]
+
+  subject {
+    common_name  = var.common_name
+    organization = var.common_name
+  }
+
+  # Store the CA public key in a file.
+  provisioner "local-exec" {
+    command = "echo '${tls_self_signed_cert.ca.cert_pem}' > '${var.ca_public_key_file_path}' && chmod 600 '${var.ca_public_key_file_path}'"
+  }
+}
+
+# vars
+
+variable "common_name" { default = "pask.com" }
+variable "ca_public_key_file_path" {
+  description = "Write the PEM-encoded CA certificate public key to this path (e.g. /etc/tls/ca.crt.pem)."
+  default = "ca.cr.pem"
+}
+

@@ -1,0 +1,31 @@
+# ---------------------------------------------------------------------------------------------------------------------
+# Provision the server using remote-exec
+# ---------------------------------------------------------------------------------------------------------------------
+
+resource "null_resource" "example_provisioner" {
+  triggers = {
+    public_ip = aws_instance.my_instance.public_ip
+  }
+
+  connection {
+    type  = "ssh"
+    host  = aws_instance.my_instance.public_ip
+    private_key = var.priv_key
+    user  = var.ssh_user
+    port  = var.ssh_port
+    agent = true
+  }
+
+  // change permissions to executable and pipe its output into a new file
+  provisioner "remote-exec" {
+    inline = [
+      "echo helloworld"
+    ]
+  }
+
+  provisioner "local-exec" {
+    # copy the public-ip file back to CWD, which will be tested
+    #command = "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${var.priv_key} ${var.ssh_user}@${aws_instance.my_instance.public_ip}:/tmp/instanceIP.txt instanceIP.txt"
+    command = "echo HelloWorld"
+  }
+}

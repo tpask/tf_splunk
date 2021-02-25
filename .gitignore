@@ -9,3 +9,6 @@
 /credentials.tf
 /variables.tf
 
+*.plan
+*.tfvars
+*.pem
