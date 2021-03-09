@@ -51,8 +51,18 @@ wget -O $splunk_rpm $splunk_download >/dev/null 2>&1
 yum update -y
 rpm -ivh $splunk_rpm
 splunk_passwd="changeme"
+
+# configure splunk web using splunk generated cert
+SPLUNK_WEB_CONF="/opt/splunk/etc/system/local/web.conf"
+echo "[settings]" > $SPLUNK_WEB_CONF
+echo "enableSplunkWebSSL = true" >>$SPLUNK_WEB_CONF
+echo "privKeyPath =  /opt/splunk/etc/auth/splunkweb/privkey.pem" >>$SPLUNK_WEB_CONF
+echo "serverCert = /opt/splunk/etc/auth/splunkweb/cert.pem" >>$SPLUNK_WEB_CONF
+
+#start splunk
 $SPLUNK_HOME/bin/splunk start --answer-yes --no-prompt --accept-license --seed-passwd $splunk_passwd
 $SPLUNK_HOME/bin/splunk enable boot-start
+
 logger `date`: done
 echo "done installing splunk" >>/tmp/out.txt
 EOF
