@@ -4,6 +4,7 @@
 
 # ignore module directory
 .terraform/
+.terraform*
 
 # ignore credentials
 /credentials.tf

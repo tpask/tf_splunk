@@ -1,12 +1,22 @@
 provider "aws" { region = var.region }
 
 
-variable "region" { type = string }
-variable "owner" { type = string }
-variable "instance_type" { type = string }
+variable "ec2_fqdn" {
+  type = string
+}
 
-
-# vars
+variable "region" {
+  type = string
+  default = "us-west-2"
+}
+variable "owner" {
+  type = string
+  default = "tp"
+}
+variable "instance_type" {
+  type = string
+  default = "t2.medium"
+}
 variable "priv_key" {
   default = "~/.ssh/id_rsa"
   type = string
@@ -33,6 +43,17 @@ variable "ssh_port" {
   default = 22
   type = number
 }
+
+variable "fire_hose_cidr" {
+  type = map
+  default = {
+    "us-west-2" = "52.89.255.224/27"
+    "us-west-1" = "13.57.135.192/27"
+    "us-east-2" = "13.58.135.96/27"
+    "us-east-1" = "52.70.63.192/27"
+  }
+
+}
 #get my local address:
 data "http" "workstation-external-ip" { url = "http://ipv4.icanhazip.com" }
 locals { workstation-external-cidr = "${chomp(data.http.workstation-external-ip.body)}/32" }
@@ -41,6 +62,11 @@ locals { workstation-external-cidr = "${chomp(data.http.workstation-external-ip.
 locals {
   instance-userdata = <<EOF
 #!/bin/bash
+
+#change host fqdn
+hostnamectl set-hostname --static ${var.ec2_fqdn}
+echo "preserve_hostname: true" >>/etc/cloud/cloud.cfg
+
 splunk_download="${var.splunk_download}"
 echo "start installing splunk: $splunk_download" >/tmp/out.txt
 splunk_rpm=`echo $splunk_download | awk -F'[=&]' '{print $10}'`
